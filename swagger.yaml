@@ -12,7 +12,7 @@ info:
     - Generate SCAN forms for USPS and DHL
     - Access account and carrier information
 
-    # 🔖 General Instructions:
+    ## 🔖 General Instructions:
     - **Authentication**: All endpoints require an `api_token` passed as a query parameter.
     - **Base URL**: `https://api.shipsaving.com/api`
     - **Format**: All request/response payloads use `application/json`.
@@ -21,7 +21,7 @@ info:
 
     Refer to each endpoint for required parameters, field descriptions, and usage notes.
     
-    # 🔖 API Integration Flow
+    ## 🔖 API Integration Flow
     ### Option 1 (Recommended):
     1. Check Label Pricing List
     2. Purchase Label
@@ -32,7 +32,7 @@ info:
     2. Check Label Pricing List
     3. Purchase Label
     
-    # 🔖 Appendix
+    ## 🔖 Appendix
     For a full list of supported carrier `service_type` values, please refer to:  
     👉 [Carrier Service Types Reference](carrier-services.html)
     

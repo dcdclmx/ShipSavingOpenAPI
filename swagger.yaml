@@ -541,6 +541,266 @@ paths:
                     items:
                       type: string
 
+  /api/shipments/scan-forms/create:
+    post:
+      tags:
+        - SCAN Form
+      summary: Create USPS SCAN Form
+      description: |
+        Creates a USPS SCAN Form for the provided list of shipment tracking codes. 
+        Only applicable to shipments with valid USPS tracking numbers.
+      parameters:
+        - in: query
+          name: api_token
+          required: true
+          schema:
+            type: string
+          description: API access token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tracking_codes:
+                  type: array
+                  items:
+                    type: string
+                  description: List of shipment tracking codes
+              required:
+                - tracking_codes
+            example:
+              tracking_codes:
+                - "9434611899562089592093"
+                - "9434611899562089592048"
+      responses:
+        "200":
+          description: Successful SCAN form creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  manifest_url:
+                    type: string
+                    description: Manifest url to Scan Form document (PDF)
+              example:
+                manifest_url: "https://.../form/2024-02-08/04f1317a7240479888ca3b35f6769a54.pdf"
+        "400":
+          description: Error occurred while creating SCAN form
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+              example:
+                message: "Invalid tracking code format or shipment not found."
+
+  /api/shipments/scan-forms/dhl/ecommerce/create:
+    post:
+      tags:
+        - DHL SCAN Form
+      summary: Create DHL eCommerce SCAN Form
+      description: >
+        This endpoint creates a DHL eCommerce SCAN Form asynchronously. The response will return a `request` ID,
+        which can be used in the `Get DHL eCommerce SCAN Form` API to retrieve the final manifest PDF.
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: API access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tracking_codes:
+                  type: array
+                  items:
+                    type: string
+                  description: List of shipment tracking codes
+              required:
+                - tracking_codes
+            examples:
+              example-1:
+                summary: Sample request
+                value:
+                  tracking_codes:
+                    - "40EB09B82E1146DE9166C499A0B4EA"
+                    - "40EB09B82E1146DE9166C499A0B4DD"
+      responses:
+        '200':
+          description: SCAN Form request accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request:
+                    type: integer
+                    description: Request ID for fetching the manifest later
+              examples:
+                success-response:
+                  value:
+                    request: 202
+        '400':
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+              example:
+                message: "Invalid tracking codes provided."
+
+  /api/shipments/scan-forms/dhl/ecommerce/get:
+    get:
+      tags:
+        - DHL SCAN Form
+      summary: Get DHL eCommerce SCAN Form
+      description: >
+        Retrieve the DHL eCommerce SCAN Form PDF URL using the `request_id` returned from the "Create DHL eCommerce SCAN Form" API.
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: API access token
+        - name: request_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Request ID returned from the create SCAN form API
+      responses:
+        '200':
+          description: Successfully retrieved manifest PDF URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: Manifest URL to the SCAN Form document (PDF)
+              examples:
+                success-response:
+                  value:
+                    url: "https://.../forms/2024-11-01/12345667.pdf"
+        '400':
+          description: Bad Request - Invalid token or request ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+              example:
+                message: "Invalid request_id or token."
+
+  /api/carrier-account/list:
+    get:
+      summary: Get Carrier Account List
+      description: |
+        Retrieve the list of carrier accounts under the authenticated user's API token.
+      operationId: getCarrierAccountList
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: API access token
+      responses:
+        '200':
+          description: Successful response with list of carrier accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the carrier account
+                      example: USPS-B
+                    token:
+                      type: string
+                      description: The unique token of the carrier account
+                      example: ca_bc28f2e7_aaaa_4bbb_accc_bf7d9f2c27fc
+                    carrier:
+                      type: string
+                      description: The carrier type of the account (e.g., USPS, UPS, FedEx, DHL Express, etc.)
+                      example: USPS
+        '400':
+          description: Bad Request (e.g., missing or invalid token)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: Invalid API token
+
+  /api/balance:
+    get:
+      summary: Get Account Balance
+      description: |
+        Retrieves the account balance information. Returns HTTP 200 with balance and currency if successful, or HTTP 400 with error message if failed.
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          description: API authentication token
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    description: Account balance
+                    example: "83,173.13"
+                  currency:
+                    type: string
+                    description: Currency. Only USD is supported.
+                    example: "usd"
+        "400":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error Message
+                    example: "Invalid token or account not found"
+
+
 
 components:
   schemas:

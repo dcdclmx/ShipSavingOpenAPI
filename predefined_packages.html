@@ -1,106 +1,203 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Predefined Packages</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 2em; }
-        table { border-collapse: collapse; width: 100%; margin-bottom: 2em; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
-    <h1>Predefined Carrier Packages</h1>
-    <p>This page lists all predefined carrier and package types supported by the system.</p>
-    <table>
-        <thead>
-            <tr><th>Carrier</th><th>Package</th></tr>
-        </thead>
-        <tbody>
-<tr><td>UPS®</td><td>Ground_Saver</td></tr>
-<tr><td>FEDEX</td><td>fedex_ground</td></tr>
-<tr><td>FEDEX</td><td>fedex_2_day</td></tr>
-<tr><td>FEDEX</td><td>fedex_2_day_am</td></tr>
-<tr><td>FEDEX</td><td>fedex_express_saver</td></tr>
-<tr><td>FEDEX</td><td>fedex_standard_overnight</td></tr>
-<tr><td>FEDEX</td><td>fedex_first_overnight</td></tr>
-<tr><td>FEDEX</td><td>fedex_priority_overnight</td></tr>
-<tr><td>FEDEX</td><td>fedex_internationaleconomy</td></tr>
-<tr><td>FEDEX</td><td>fedex_international_first</td></tr>
-<tr><td>FEDEX</td><td>fedex_international_priority</td></tr>
-<tr><td>FEDEX</td><td>fedex_home_delivery</td></tr>
-<tr><td>FEDEX</td><td>fedex_smartpost</td></tr>
-<tr><td>FEDEX</td><td>fedex_international_connect_plus</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dhl_ecommerce_parcel_expedited</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dhl_ecommerce_parcel_expedited_max</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dh_ecommerce_parcel_ground</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dhl_ecommerce_bpm_expedited</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dhl_ecommerce_bpm_ground</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dhl_ecommerce_parcel_intemational_dire</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dhl_ecommerce_parcel_interational_sta</td></tr>
-<tr><td>DHL_ECOMMERCE</td><td>dh_ecommerce_packet_international</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_worldwide_b2c</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_worldwide_b2c_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_jet_line_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_sprint_line</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_euro_pack_doc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_break_bulk_express</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_medical_express</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_worldwide_doc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_0900_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_freight_worldwide_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_domestic_economy_select</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_economy_select_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_domestic_express_0900</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_jumbo_box_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_0900</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_1030</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_domestic_express</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_domestic_express_1030</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_worldwide_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_medical_express_nodoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_global_mail_business</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_same_day</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_1200_doc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_worldwide_ecx</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_euro_pack_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_economy_select</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_envelope</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_1200_nondoc</td></tr>
-<tr><td>DHL_EXPRESS</td><td>dhl_express_domestic_express_1200</td></tr>
-<tr><td>CANADA_POST</td><td>canada_post_priority</td></tr>
-<tr><td>CANADA</td><td>_POST_canada_post_expedited_parcel</td></tr>
-<tr><td>CANADA_POST</td><td>canada_post_xpresspost</td></tr>
-<tr><td>Table</td><td>2:</td></tr>
-<tr><td>CARRIERS</td><td>packages</td></tr>
-<tr><td>usps</td><td>usps_postcard</td></tr>
-<tr><td>USPS</td><td>usps_letter</td></tr>
-<tr><td>usps</td><td>usps_large_envelope_or_flat</td></tr>
-<tr><td>USPS</td><td>usps_thick_envelope</td></tr>
-<tr><td>usps</td><td>usps_small_flat_rate_box</td></tr>
-<tr><td>usps</td><td>usps_medium_flat_rate_box</td></tr>
-<tr><td>usps</td><td>usps_large_flat_rate_box</td></tr>
-<tr><td>USPS</td><td>usps_flat_rate_envelope</td></tr>
-<tr><td>USPS</td><td>usps_padded_flat_rate_envelope</td></tr>
-<tr><td>USPS</td><td>usps_legal_flat_rate_envelope</td></tr>
-<tr><td>UPS</td><td>ups_letter</td></tr>
-<tr><td>UPS</td><td>ups_25kg_box</td></tr>
-<tr><td>UPS</td><td>ups_10kg_box</td></tr>
-<tr><td>UPS</td><td>ups_tube</td></tr>
-<tr><td>UPS</td><td>ups_pak</td></tr>
-<tr><td>UPS</td><td>ups_express_box_small</td></tr>
-<tr><td>UPS</td><td>ups_express_box_medium</td></tr>
-<tr><td>UPS</td><td>ups_express_box_large</td></tr>
-<tr><td>FEDEX</td><td>fedex_pak</td></tr>
-<tr><td>FEDEX</td><td>fedex_tube</td></tr>
-<tr><td>FEDEX</td><td>fedex_small_box</td></tr>
-<tr><td>FEDEX</td><td>fedex_medium_box</td></tr>
-<tr><td>FEDEX</td><td>fedex_large_box</td></tr>
-<tr><td>FEDEX</td><td>fedex_extra_large_box</td></tr>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2em;
+      }
 
-        </tbody>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 2em;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Predefined Carrier Packages</h1>
+    <p>
+      This page lists all predefined carrier and package types supported by the
+      system.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Carrier</th>
+          <th>Package</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- USPS -->
+        <tr>
+          <td>USPS</td>
+          <td>usps_postcard</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_letter</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_large_envelope_or_flat</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_thick_envelope</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_small_flat_rate_box</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_medium_flat_rate_box</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_large_flat_rate_box</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_flat_rate_envelope</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_padded_flat_rate_envelope</td>
+        </tr>
+        <tr>
+          <td>USPS</td>
+          <td>usps_legal_flat_rate_envelope</td>
+        </tr>
+
+        <!-- UPS -->
+        <tr>
+          <td>UPS</td>
+          <td>ups_letter</td>
+        </tr>
+        <tr>
+          <td>UPS</td>
+          <td>ups_25kg_box</td>
+        </tr>
+        <tr>
+          <td>UPS</td>
+          <td>ups_10kg_box</td>
+        </tr>
+        <tr>
+          <td>UPS</td>
+          <td>ups_tube</td>
+        </tr>
+        <tr>
+          <td>UPS</td>
+          <td>ups_pak</td>
+        </tr>
+        <tr>
+          <td>UPS</td>
+          <td>ups_express_box_small</td>
+        </tr>
+        <tr>
+          <td>UPS</td>
+          <td>ups_express_box_medium</td>
+        </tr>
+        <tr>
+          <td>UPS</td>
+          <td>ups_express_box_large</td>
+        </tr>
+
+        <!-- FEDEX -->
+        <tr>
+          <td>FEDEX</td>
+          <td>fedex_pak</td>
+        </tr>
+        <tr>
+          <td>FEDEX</td>
+          <td>fedex_tube</td>
+        </tr>
+        <tr>
+          <td>FEDEX</td>
+          <td>fedex_small_box</td>
+        </tr>
+        <tr>
+          <td>FEDEX</td>
+          <td>fedex_medium_box</td>
+        </tr>
+        <tr>
+          <td>FEDEX</td>
+          <td>fedex_large_box</td>
+        </tr>
+        <tr>
+          <td>FEDEX</td>
+          <td>fedex_extra_large_box</td>
+        </tr>
+
+        <!-- DHL -->
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_jumbo_document</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_jumbo_parcel</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_document</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_flyer</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_domestic</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_express_document</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_envelope</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_jumbo_box</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_jumbo_junior_document</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_junior_jumbo_box</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_jumbo_junior_parcel</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_other_dhl_packaging</td>
+        </tr>
+        <tr>
+          <td>DHL_EXPRESS</td>
+          <td>dhl_express_parcel</td>
+        </tr>
+      </tbody>
     </table>
-</body>
+  </body>
 </html>

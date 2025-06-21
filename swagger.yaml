@@ -11,30 +11,36 @@ info:
     - Purchase and void shipping labels
     - Generate SCAN forms for USPS and DHL
     - Access account and carrier information
-
-    ## 🔖 General Instructions:
-    - **Authentication**: All endpoints require an `api_token` passed as a query parameter.
-    - **Base URL**: `https://api.shipsaving.com/api`
-    - **Format**: All request/response payloads use `application/json`.
-    - **Rate Limiting**: Each endpoint may have rate limits (e.g., 900 req/min for `/rates/list`).
-    - **Error Handling**: HTTP 4xx/5xx errors include a `message` field in the response body.
-
-    Refer to each endpoint for required parameters, field descriptions, and usage notes.
     
-    ## 🔖 API Integration Flow
-    ### Option 1 (Recommended):
+    ##  API Integration Flow
+    ### 👍 Option 1:
     1. Check Label Pricing List
     2. Purchase Label
-    ### Option 2 （Limitation about this option: This interface is only applicable to you just have one same type carrier account, like one UPS account, one FEDEX account, one USPS account）:
+    
+    ### Option 2:
+    💡Limitation about this option: This interface is only applicable to you just have one same type carrier account, like one UPS account, one FEDEX account, one USPS account
     1. Directly Buy Label
-    ### Option 3 (Creating orders to our system is not required, you can keep your orders in your system):
+
+    ### Option 3 
+    💡Creating orders to our system is not required, you can keep your orders in your system
     1. Create Orders
     2. Check Label Pricing List
     3. Purchase Label
     
-    ## 🔖 Appendix
+    
+    ## API Access
+    1. Log in to the ShipSaving system. Navigate to **Settings > General**, then click **Renew API Token**. 
+        
+        💡 Be sure to save the newly generated token, as the previous token will become invalid once a new one is created.
+    2. Token settings page: https://s.shipsaving.com/settings/general
+    3. ShipSaving provides a RESTful API that uses JSON as both the input and output format.
+    
+
+    
+    ## Appendix
     👉 [Carrier Service Types Reference](carrier-services.html)</br>
     👉 [Carrier Predefined Packages Reference](predefined_packages.html)
+
 
     _Last updated: 2025-06-17_
 servers:
@@ -49,8 +55,372 @@ paths:
       tags:
       - Check Label Pricing List
       summary: Retrieve shipping rates for a given package and address.
-      description: ｜ 
+      description: >
         **API usage limit:** 900 requests per minute.
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/ShipmentRequest'
+                 
+      responses:
+        '200':
+          description: Rate list retrieved successfully
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/RatingResponse'
+                
+        '400':
+          description: Error retrieving rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+  /api/rates/buy:
+    get:
+      tags: 
+      - Purchase shipping label
+      summary: Purchase shipping label
+      description: Purchase a shipping label based on the provided rate ID.
+      operationId: purchaseLabel
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Your API token from ShipSaving.
+        - name: rate_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Unique identifier of the shipping rate.
+      responses:
+        # '200':
+        #   description: Label successfully purchased.
+        #   content:
+        #     application/json:
+        #       schema:
+        #         $ref: '#/components/schemas/PurchaseLabelResponse'
+        '400':
+          description: Invalid request or missing parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+  /api/rates/buy-label:
+    post:
+      tags: 
+        - Directly Buy Label
+      summary: Directly Buy Label
+      description: >
+        This endpoint allows purchasing a label directly without checking multiple carrier options.
+        It is only applicable when there is a single carrier for each carrier type in the user's account.
+        If multiple carriers of the same type exist, please first use the `Check Label Pricing List` API
+        followed by the `Purchase Label` API.
+      operationId: directlyBuyLabel
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Your API token from the ShipSaving system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentRequest'  # 假设你已将 requestBody 抽成了通用 schema
+      responses:
+        # '200':
+        #   description: Label successfully purchased
+        #   content:
+        #     application/json:
+        #       schema:
+        #         $ref: '#/components/schemas/PurchaseLabelResponse'
+        '400':
+          description: Invalid request or missing parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+  /api/orders/create:
+    post:
+      summary: Create Orders (Optional API)
+      description: |
+        This endpoint creates a new order in the ShipSaving system. Useful when pre-creating orders before label generation.
+      parameters:
+        - in: query
+          name: api_token
+          required: true
+          schema:
+            type: string
+          description: Your ShipSaving API token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: Order successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_number:
+                    type: string
+                    description: Order number
+        '400':
+          description: Error creating order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+  /api/shipments/get:
+    get:
+      summary: Check Order Labels
+      description: >
+        This endpoint retrieves shipment label information for a given store and order number.  
+        It is only applicable to orders that have already purchased a label.
+      operationId: checkOrderLabels
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Your ShipSaving API token
+        - name: store_name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Store name in the ShipSaving system
+        - name: order_number
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Order number associated with the purchased label
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    packing_slip_number:
+                      type: integer
+                      description: Packing slip number
+                    carrier:
+                      type: string
+                      description: Carrier's name
+                    predefined_package:
+                      type: string
+                      description: Carrier’s predefined packaging type
+                    service_level:
+                      type: string
+                      description: Carrier service type
+                    tracking_code:
+                      type: string
+                      description: Tracking number
+                    length:
+                      type: number
+                      format: float
+                      description: Package length (inch)
+                    width:
+                      type: number
+                      format: float
+                      description: Package width (inch)
+                    height:
+                      type: number
+                      format: float
+                      description: Package height (inch)
+                    weight:
+                      type: number
+                      format: float
+                      description: Package weight (lb)
+                    rate:
+                      type: number
+                      format: float
+                      description: Shipping rate
+                    service_fee:
+                      type: number
+                      format: float
+                      description: System service fee
+                    label_width:
+                      type: number
+                      format: float
+                      description: Label width (inch)
+                    label_height:
+                      type: number
+                      format: float
+                      description: Label height (inch)
+                    label_urls:
+                      type: array
+                      items:
+                        type: string
+                      description: List of image URLs for shipping labels
+                    commercial_invoice_urls:
+                      type: array
+                      items:
+                        type: string
+                      description: List of image URLs for commercial invoices (U.S. Letter)
+        '400':
+          description: Bad Request (e.g. missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+  /api/shipments/void:
+    post:
+      summary: Void Label
+      description: >
+        This endpoint allows you to void a purchased shipping label using the shipment's tracking number.
+      operationId: voidLabel
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Your ShipSaving API token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tracking_code
+              properties:
+                tracking_code:
+                  type: string
+                  description: Shipment tracking number
+            example:
+              tracking_code: "9435811899562089111365"
+      responses:
+        '200':
+          description: Label voided successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tracking_code:
+                    type: string
+                    description: The tracking number of the voided label
+              example:
+                tracking_code: "9435811899562089111365"
+        '400':
+          description: Error occurred while voiding the label
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+              example:
+                message: "Invalid tracking code"
+  /api/orders/delete:
+    delete:
+      summary: Delete an order
+      description: >
+        Deletes an existing order using the store name and order number.
+        Requires a valid `api_token` as a query parameter.
+      tags:
+        - Orders
+      parameters:
+        - name: api_token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Authentication token for API access.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - store_name
+                - order_number
+              properties:
+                store_name:
+                  type: string
+                  description: The store name associated with the order.
+                  example: "MM 3C Store"
+                order_number:
+                  type: string
+                  description: Unique identifier of the order to be deleted.
+                  example: "20240201125047532"
+      responses:
+        '200':
+          description: Order deleted successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+              example: []
+        '400':
+          description: Error occurred while deleting order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+              example:
+                message: "Invalid order number or store name"
+  /api/addresses/verify:
+    post:
+      summary: Address Verification
+      description: |
+        Verifies and standardizes an address based on the provided details.
+        This API checks for errors and returns suggestions or corrections.
+      operationId: verifyAddress
       parameters:
         - name: api_token
           in: query
@@ -63,239 +433,432 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - from
-                - to
-                - shipments
               properties:
-                from:
-                  type: object
-                  description: Shipper's address
-                  properties:
-                    name:
-                      type: string
-                      description: Shipper's full name
-                    company:
-                      type: string
-                      description: Shipper's company name
-                    email:
-                      type: string
-                      description: Shipper's email address
-                    phone:
-                      type: string
-                      description: Shipper's phone number. Required for international shipments.
-                    street:
-                      type: string
-                      description: Shipper's street address
-                    street2:
-                      type: string
-                      description: Secondary address line (e.g., apartment, suite, floor). Optional.
-                    city:
-                      type: string
-                      description: Shipper's city
-                    state:
-                      type: string
-                      description: Shipper's state
-                    zip:
-                      type: string
-                      description: Shipper's zip code
-                    country:
-                      type: string
-                      description: Shipper's country (ISO 3166-1 two-digit code)
-                    residential:
-                      type: boolean
-                      description: Whether the address is residential
-                to:
-                  type: object
-                  description: Recipient's address
-                  properties:
-                    name:
-                      type: string
-                      description: Recipient's full name
-                    company:
-                      type: string
-                      description: Recipient's company name
-                    email:
-                      type: string
-                      description: Recipient's email address
-                    phone:
-                      type: string
-                      description: Recipient's phone number. Required for international shipments.
-                    street:
-                      type: string
-                      description: Recipient's street address
-                    street2:
-                      type: string
-                      description: Secondary address line (e.g., apartment, suite, floor). Optional.
-                    city:
-                      type: string
-                      description: Recipient's city
-                    state:
-                      type: string
-                      description: Recipient's state
-                    zip:
-                      type: string
-                      description: Recipient's zip code
-                    country:
-                      type: string
-                      description: Recipient's country (ISO 3166-1 two-digit code)
-                    residential:
-                      type: boolean
-                      description: Whether the address is residential
-                shipments:
-                  type: array
-                  description: List of shipments
-                  items:
-                    type: object
-                    required:
-                      - length
-                      - width
-                      - height
-                      - weight
-                    properties:
-                      length:
-                        type: number
-                        description: Package length (inch)
-                      width:
-                        type: number
-                        description: Package width (inch)
-                      height:
-                        type: number
-                        description: Package height (inch)
-                      weight:
-                        type: number
-                        description: Package weight (pound)
-                order:
-                  type: object
-                  description: Order information
-                  properties:
-                    warehouse_name:
-                      type: string
-                      description: Pre-existing warehouse name in ShipSaving system
-                options:
-                  type: object
-                  description: Additional shipping options
-                  properties:
-                    require_saturday_delivery:
-                      type: boolean
-                      description: Whether this shipment requires Saturday delivery
-                    require_hazmat:
-                      type: boolean
-                      description: Whether the shipment contains hazardous materials (USPS only)
-                    label_type:
-                      type: string
-                      description: Label format type (e.g., pdf, zpl)
+                street:
+                  type: string
+                  description: Street
+                  example: "XXX Avenue Park"
+                street2:
+                  type: string
+                  description: Secondary address information (optional)
+                  example: "Apt 5B"
+                city:
+                  type: string
+                  description: City
+                  example: "Malden"
+                state:
+                  type: string
+                  description: State
+                  example: "MA"
+                zip:
+                  type: string
+                  description: Zip code
+                  example: "02148"
+                country:
+                  type: string
+                  description: ISO 3166-1 alpha-2 country code
+                  example: "US"
+              required:
+                - street
+                - city
+                - zip
+                - country
       responses:
         '200':
-          description: Rate list retrieved successfully
+          description: Address verification result
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  rates:
+                  errored:
+                    type: boolean
+                    description: Whether the address has an error
+                  corrected:
+                    type: boolean
+                    description: Whether the address was corrected
+                  standardized:
+                    type: boolean
+                    description: Whether the address was standardized
+                  errors:
                     type: array
-                    description: List of shipment rates
                     items:
                       type: object
                       properties:
-                        shipment_id:
+                        code:
                           type: string
-                          description: Shipment ID
-                        rate_id:
+                          example: "ADDRESS.PRIMARY.INVALID"
+                        message:
                           type: string
-                          description: Rate ID
-                        provider:
+                          example: "Primary number invalid."
+                  corrections:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
                           type: string
-                          description: Carrier account provider, ShipSaving or user's own account
-                        account_name:
+                          example: "ADDRESS.COMPONENT.CHANGED"
+                        message:
                           type: string
-                          description: Carrier account name
-                        carrier:
-                          type: string
-                          description: Carrier, USPS, UPS, FEDEX, or DHL
-                        service:
-                          type: string
-                          description: Carrier service
-                        package:
-                          type: string
-                          description: My package or carrier predefined packages
-                        delivery_days:
-                          type: string
-                          description: Course of traveling days to destination
-                        published_rate:
-                          type: number
-                          format: float
-                          description: Standard shipping rate before discount
-                        rate:
-                          type: number
-                          format: float
-                          description: Actual shipping rate after discount
-                        rebate:
-                          type: number
-                          format: float
-                          description: The saved shipping cost
+                          example: "An address component (i.e., directional or suffix only) was changed"
+                  street:
+                    type: string
+                    example: "XXX AVE"
+                  street2:
+                    type: string
+                    example: null
+                  city:
+                    type: string
+                    example: "City"
+                  state:
+                    type: string
+                    example: "MA"
+                  zip:
+                    type: string
+                    example: "02148"
+                  country:
+                    type: string
+                    example: "US"
+                  residential:
+                    type: boolean
+                    example: true
         '400':
-          description: Error retrieving rates
+          description: Error during address verification
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  code:
+                    type: string
+                    example: "400"
                   message:
                     type: string
-                    description: Error message
+                    example: "Invalid input"
+                  errors:
+                    type: array
+                    items:
+                      type: string
 
-  
+
 components:
   schemas:
-    ShipmentItem:
+    ShipmentRequest:
+      type: object
+      required:
+        - from
+        - to
+        - shipments
+      properties:
+        carrier:
+          type: object
+          description: Carrier information
+          properties:
+            carrier_token:
+              type: string
+              description: Please refer to your ShipSaving account Carrier Accounts -> Token
+        from:
+          type: object
+          description: Shipper's address
+          required:
+            - name    
+            - street
+            - city
+            - state
+            - zip
+            - country
+          properties:
+            name:
+              type: string
+              description: Shipper's full name
+            company:
+              type: string
+              description: Shipper's company name
+            email:
+              type: string
+              description: Shipper's email address
+            phone:
+              type: string
+              description: Shipper's phone number. Required for international shipments.
+            street:
+              type: string
+              description: Shipper's street address
+            street2:
+              type: string
+              description: Secondary address line (e.g., apartment, suite, floor). Optional.
+            city:
+              type: string
+              description: Shipper's city
+            state:
+              type: string
+              description: Shipper's state
+            zip:
+              type: string
+              description: Shipper's zip code
+            country:
+              type: string
+              description: Shipper's country [ISO 3166-1 two-digit code](https://en.wikipedia.org/wiki/ISO_3166-1)
+        to:
+          type: object
+          description: Recipient's address
+          required:
+            - name    
+            - street
+            - city
+            - state
+            - zip
+            - country
+          properties:
+            name:
+              type: string
+              description: Recipient's full name
+            company:
+              type: string
+              description: Recipient's company name
+            email:
+              type: string
+              description: Recipient's email address
+            phone:
+              type: string
+              description: Recipient's phone number. Required for international shipments.
+            street:
+              type: string
+              description: Recipient's street address
+            street2:
+              type: string
+              description: Secondary address line (e.g., apartment, suite, floor). Optional.
+            city:
+              type: string
+              description: Recipient's city
+            state:
+              type: string
+              description: Recipient's state
+            zip:
+              type: string
+              description: Recipient's zip code
+            country:
+              type: string
+              description: Recipient's country [ISO 3166-1 two-digit code](https://en.wikipedia.org/wiki/ISO_3166-1)
+            residential:
+              type: boolean
+              description: Whether the address is residential
+        shipments:
+          type: array
+          description: List of shipments
+          items:
+            type: object
+            required:
+              - length
+              - width
+              - height
+              - weight
+            properties:
+              length:
+                type: number
+                description: Package length (inch)
+              width:
+                type: number
+                description: Package width (inch)
+              height:
+                type: number
+                description: Package height (inch)
+              weight:
+                type: number
+                description: Package weight (pound)
+              packages:
+                type: array
+                items:
+                  type: string
+                description: >
+                  This field accepts carrier predefined packages, for example: usps_thick_envelope, usps_small_flat_rate_box, etc. For a full list, see the appendix Carrier Predefined Packages Reference.
+              insurance_amount:
+                type: number
+                format: float
+                description: >
+                  Amount for insured shipment. Must be used in conjunction with insurance_provider.
+              custom_print1:
+                type: string
+                description: >
+                  Customized print on label.If the label itself supports custom printing content, this field will be printed onto the label.
+              custom_print2:
+                type: string
+                description: >
+                  Customized print on label.If the label itself supports custom printing content, this field will be printed onto the label.
+              contents:
+                type: array
+                description: > 
+                  List of items filed for customs (*required for international)
+                items:
+                  type: object
+                  required:
+                    - weight
+                    - description
+                    - quantity
+                    - value
+                    - origin_country
+                  properties:
+                    weight:
+                      type: number
+                      description: weight for each item
+                    description:
+                      type: string
+                      description: item title
+                    quantity:
+                      type: integer
+                      description: item quantity
+                    value:
+                      type: number
+                      description: item price
+                    hs_tariff_number:
+                      type: string
+                      description: tariff number
+                    origin_country:
+                      type: string
+                      description: >
+                        2-letter code for origin country. This field’s value
+                        will be an [ISO 3166-1 two-digit code](https://en.wikipedia.org/wiki/ISO_3166-1).
+        
+        order:
+          type: object
+          description: Order information
+          required:
+            - warehouse_name
+          properties:
+            warehouse_name:
+              type: string
+              description: Pre-existing warehouse name in ShipSaving system
+            store_name:
+              type: string
+              description: >
+                Pre-existing store name in ShipSaving system. (Please refer to your ShipSaving account Stores -> Stores Nickname. If you use order_number, then the store_name of the order is required)
+            order_number:
+              type: string
+              description: >
+                Pre-existing order number in ShipSaving system. If you need to check label price or buy a label for an order which already existed in our system, then this field is required.
+            status:
+              type: string
+              description: >
+                Used with order_number; sets order status (awaiting, hold, or shipped) after label purchase. Defaults to awaiting if omitted.
+            service_type:
+              type: string
+              description: >
+                Order parameter, service type: usps_ground_advantage, usps_priority_mail, etc.'
+            signature:
+              type: string
+              description: 'Order parameter: NO_SIGNATURE, SIGNATURE, or ADULT_SIGNATURE'
+            insurance_provider:
+              type: string
+              description: 'Order parameter: SHIPSURANCE or CARRIER. Used with the field insurance_amount.'
+            contents_type:
+              type: string
+              description: > 
+                Order parameter: package content type is GIFT, MERCHANDISE, SAMPLE, RETURNED_GOODS or DOCUMENTS'
+            non_delivery_option:
+              type: string
+              description: 'Order parameter: undeliverable options, RETURN or ABANDON'
+            eel_pfc_type:
+              type: string
+              description: 'Order parameter: recipient exemption code or ITN: EXEMPTION_CODE,ITN'
+            eel_pfc_code:
+              type: string
+              description: 'Order parameter: recipient exemption code or ITN'
+            tax_ids:
+              type: array
+              description: "Order parameter, recipient\u2019s tax ID"
+              items:
+                type: object
+                properties:
+                  tax_id_type:
+                    type: string
+                    description: "tax_ids parameter, recipient\u2019s tax ID type (e.g., TIN,\
+                      \ EIN, SSN, VAT, etc.)"
+                  tax_id_number:
+                    type: string
+                    description: The value corresponding to the tax ID type
+                  tax_id_country:
+                    type: string
+                    description: "tax_ids parameter, recipient\u2019s tax ID country (ISO\
+                      \ 3166-1 two-digit code)"
+        options:
+          type: object
+          description: Additional shipping options
+          properties:
+            ship_date:
+              type: string
+              description: >
+                *required for DHL rates. (The time is in ISO format with local time including the time zone. For example: 2024-02-07T10:55:56-08:00)
+            require_saturday_delivery:
+              type: boolean
+              description: Whether this shipment requires Saturday delivery
+            require_hazmat:
+              type: boolean
+              description: > 
+                Whether this shipment contains dangerous goods or hazardous materials (USPS Ground Advantage service only). View [tutorial](https://www.uspsdelivers.com/hazmat-shipping-safety/) about how to package, label and ship HAZMAT for domestic shipments.
+            label_type:
+              type: string
+              description: > 
+                The possible values are "pdf" or "png". If this parameter is not provided, the default value is "png".
+              enum: [png, pdf]
+                
+        recipient_tax_ids:
+          type: array
+          description: Recipient's tax information
+          items:
+            type: object
+            properties:
+              tax_id_type: 
+                type: string
+                description: recipient_tax_ids parameter，TIN，EIN，SSN， VAT，EORI，IOSS，PAN，VOEC
+              tax_id_number:
+                type: string
+                description: recipient_tax_ids parameter
+    RatingResponse:
       type: object
       properties:
-        sku:
-          type: string
-        title:
-          type: string
-        quantity:
-          type: integer
-        price:
-          type: number
-        tax:
-          type: number
-        shipping_cost:
-          type: number
-    Shipment:
-      type: object
-      properties:
-        length:
-          type: number
-        width:
-          type: number
-        height:
-          type: number
-        weight:
-          type: number
-        signature:
-          type: string
-          enum: [NO_SIGNATURE, SIGNATURE, ADULT_SIGNATURE]
-        insurance_provider:
-          type: string
-          enum: [SHIPSURANCE, CARRIER]
-        insurance_amount:
-          type: number
-        custom_print1:
-          type: string
-        custom_print2:
-          type: string
-        items:
+        rates:
           type: array
+          description: List of shipment rates
           items:
-            $ref: '#/components/schemas/ShipmentItem'
-        notes:
-          type: array
-          items:
-            type: string
-    CreateOrderRequest:
+            type: object
+            properties:
+              shipment_id:
+                type: string
+                description: Shipment ID
+              rate_id:
+                type: string
+                description: Rate ID
+              provider:
+                type: string
+                description: Carrier account provider, ShipSaving or user's own account
+              account_name:
+                type: string
+                description: Carrier account name
+              carrier:
+                type: string
+                description: Carrier, USPS, UPS, FEDEX, or DHL
+              service:
+                type: string
+                description: Carrier service
+              package:
+                type: string
+                description: My package or carrier predefined packages
+              delivery_days:
+                type: string
+                description: Course of traveling days to destination
+              published_rate:
+                type: number
+                format: float
+                description: Standard shipping rate before discount
+              rate:
+                type: number
+                format: float
+                description: Actual shipping rate after discount
+              rebate:
+                type: number
+                format: float
+                description: The saved shipping cost
+    CreateOrderRequest:  
       type: object
       required:
         - store_name
@@ -311,37 +874,109 @@ components:
       properties:
         store_name:
           type: string
+          description: Store name, must already exist in the system. (Please refer to your ShipSaving account Stores -> Stores Nickname)
         order_number:
           type: string
+          description: Order number. If not provided, it will be auto-generated.
         warehouse_name:
           type: string
+          description: Warehouse name, which must be pre-existing in the system. (Please refer to your ShipSaving account Warehouses -> Warehouses name)
         verify_address:
           type: boolean
+          description: Whether or not the client address needs to be verified by our system. The address verification result will be displayed next to the order within 3 to 5 minutes after the order is created.
         client_name:
           type: string
+          description: Client's full name.
         client_company:
           type: string
+          description: Client's company name.
         client_email:
           type: string
+          description: Client's email address.
         client_phone:
           type: string
+          description: Client's phone number. Required for international addresses.
         client_street:
           type: string
+          description: Client's street address.
         client_street2:
           type: string
+          description: Second line of address (e.g., apt, suite).
         client_city:
           type: string
+          description: Client's city.
         client_state:
           type: string
+          description: Client's state.
         client_zip:
           type: string
+          description: Client's zip code.
         client_country:
           type: string
+          description: Client's country (ISO 3166-1 alpha-2 code).
         shipments:
           type: array
+          description: List of shipments
           items:
-            $ref: '#/components/schemas/Shipment'
+            type: object
+            properties:
+              length:
+                type: number
+                description: Package length (inch)
+              width:
+                type: number
+                description: Package width (inch)
+              height:
+                type: number
+                description: Package height (inch)
+              weight:
+                type: number
+                description: Package weight (pound)
+              signature:
+                type: string
+                description: Signature option (NO_SIGNATURE, SIGNATURE, ADULT_SIGNATURE)
+              insurance_provider:
+                type: string
+                description: Insurance provider (SHIPSURANCE or CARRIER)
+              insurance_amount:
+                type: number
+                description: Insurance amount, used with insurance_provider
+              custom_print1:
+                type: string
+                description: Custom print on label line 1
+              custom_print2:
+                type: string
+                description: Custom print on label line 2
+              items:
+                type: array
+                description: List of items in the shipment
+                items:
+                  type: object
+                  required:
+                    - sku
+                    - quantity
+                    - price
+                  properties:
+                    sku:
+                      type: string
+                      description: Item SKU
+                    title:
+                      type: string
+                      description: Item title
+                    quantity:
+                      type: integer
+                      description: Item quantity
+                    price:
+                      type: number
+                      description: Price per item
+                    tax:
+                      type: number
+                      description: Commercial tax per item
+                    shipping_cost:
+                      type: number
+                      description: Shipping cost for the item
         notes:
           type: array
+          description: Optional array of notes
           items:
             type: string
